@@ -1,0 +1,15 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "tsnip": {
+      "description": "A blank schematic.",
+      "factory": "./tsnip/index#tsnip",
+      "schema": "./tsnip/schema.json"
+    },
+    "service": {
+      "description": "Service schematics.",
+      "factory": "./service/index#serviceSchematics",
+      "schema": "./service/schema.json"
+    }
+  }
+}

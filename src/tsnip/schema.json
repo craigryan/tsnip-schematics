@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "tsnip-schematics2",
+  "title": "Do stuff",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name.",
+      "type": "string",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
