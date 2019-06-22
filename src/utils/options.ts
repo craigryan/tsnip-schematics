@@ -2,6 +2,7 @@ import { Tree } from '@angular-devkit/schematics';
 import {getWorkspace} from '@schematics/angular/utility/config';
 import {buildDefaultPath, getProject} from '@schematics/angular/utility/project';
 import {parseName} from '@schematics/angular/utility/parse-name';
+// import {paths} from '@schematics/angular/utility/paths';
 import { WorkspaceSchema, WorkspaceProject, ProjectType } from '@schematics/angular/utility/workspace-models';
 import { constants } from './constants';
 
@@ -21,6 +22,7 @@ export function setupOptions(host: Tree, options: any): Tree {
     options.path = buildDefaultPath(project);
   }
 
+  // const rel = paths.
   const parsedPath = parseName(options.path, options.name);
   options.name = parsedPath.name;
   options.path = parsedPath.path;

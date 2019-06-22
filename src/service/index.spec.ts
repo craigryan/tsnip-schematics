@@ -4,10 +4,10 @@ import * as path from 'path';
 
 const collectionPath = path.join(__dirname, '../collection.json');
 
-describe('tsnip-schematics', () => {
-  it('works', () => {
+describe('services schematic', () => {
+  it('should run the service schematic', () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    const tree = runner.runSchematic('tsnip-schematics', {}, Tree.empty());
+    const tree = runner.runSchematic('service', {}, Tree.empty());
 
     expect(tree.files).toEqual([]);
   });
