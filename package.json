@@ -1,14 +1,21 @@
 {
-  "name": "tsnip-schematics2",
+  "name": "tsnip-schematics",
   "version": "0.0.0",
-  "description": "A blank schematics",
+  "description": "A schematics for generating Angular test snippets",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
-    "test": "npm run build && jasmine src/**/*.spec.js"
+    "test": "npm-run-all -s build spec:nowatch",
+    "test:watch": "npm-run-all -s build spec:watch",
+    "spec:nowatch": "jasmine src/**/*.spec.ts",
+    "spec:watch": "jasmine src/**/*.spec.js --watch"
   },
   "keywords": [
-    "schematics"
+    "schematics",
+    "angular",
+    "specs",
+    "test",
+    "snippets"
   ],
   "author": "Craig Ryan",
   "license": "MIT",
@@ -21,5 +28,10 @@
     "@types/node": "^8.0.31",
     "jasmine": "^3.4.0",
     "typescript": "~3.4.0"
+  },
+  "devDependencies": {
+    "jasmine-ts": "^0.3.0",
+    "npm-run-all": "^4.1.5",
+    "nyc": "^14.1.1"
   }
 }

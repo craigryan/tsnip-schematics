@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
+import * as ts from 'typescript';
 
 interface ApiResponse {
   stringValue: string

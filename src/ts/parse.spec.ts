@@ -2,6 +2,7 @@ import { tsSource } from '../ts/source';
 import * as parse from './parse';
 import * as parsec from './parse-class';
 import * as parsem from './parse-method';
+import * as parsei from './parse-import';
 import * as ts from 'typescript';
 
 describe('Parsing', () => {
@@ -15,10 +16,22 @@ describe('Parsing', () => {
 
   describe('in source file', () => {
 
-    it('should find imports', () => {
+    fit('should find imports', () => {
       const n: Array<any> = parse.findImportStatements(fileNode);
       expect(n).toBeTruthy();
       expect(n.length).toEqual(4);
+      /*
+        import { Injectable, Inject } from '@angular/core';
+        import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
+        import {Observable, of} from 'rxjs';
+        import {map} from 'rxjs/operators';
+        import * as ts from 'typescript';
+      */
+      const i1 = n[0];
+      expect(i1.kind).toEqual(ts.SyntaxKind.ImportDeclaration);
+      const i1Decl: parsei.ImportDetails = parsei.importDetails(i1);
+      expect(i1Decl).toBeTruthy();
+      expect(i1Decl.lib).toEqual('@angular/core');
     });
     it('should find class declaration', () => {
       const n = parse.findClassDeclaration(fileNode);
@@ -76,7 +89,7 @@ describe('Parsing', () => {
     it('should find method declaration', () => {
       const methods: Array<any> = parsec.findClassMethods(fileNode, true);
       const firstMethod = methods[0];
-      const n: parsem.MethodDeclaration = parsem.findMethodDeclaration(firstMethod);
+      const n: parsem.MethodDetails = parsem.findMethodDeclaration(firstMethod);
       // console.log('t decl', n);
       expect(n).toBeTruthy();
       expect(n.name).toBeTruthy();

@@ -5,6 +5,12 @@ import * as ast from '@schematics/angular/utility/ast-utils';
  * High level parsing - imports, class nodes, decorators, and some general AST finders
  */
 
+// Param or field declaration (name: type)
+export interface DeclarationDetails {
+  name: string;
+  typedTo: string;
+}
+
 // import * as fs from 'fs';
 
 /*
@@ -35,6 +41,15 @@ import * as ast from '@schematics/angular/utility/ast-utils';
 */
 export function findImportStatements(source: ts.Node): ts.Node[] {
   return ast.findNodes(source, ts.SyntaxKind.ImportDeclaration);
+}
+
+// name: type, return name and type details
+export function declarationDetails(declNode: ts.Node): DeclarationDetails {
+  let det: DeclarationDetails = {
+    name: '',
+    typedTo: ''
+  };
+  return det;
 }
 
 /*

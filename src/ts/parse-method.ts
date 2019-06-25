@@ -4,7 +4,7 @@ import * as parse from './parse';
 
 // https://github.com/Microsoft/TypeScript/blob/964565e06968259fc4e6de6f1e88ab5e0663a94a/lib/typescript.d.ts#L62
 
-export interface MethodDeclaration {
+export interface MethodDetails {
   name: string;
   isPrivate: boolean;
   parameters: ts.Node[] | undefined;
@@ -43,8 +43,8 @@ export interface MethodDeclaration {
                                 Text: >
 */
 // Method name, params and return type
-export function findMethodDeclaration(decl: ts.Node | null): MethodDeclaration | null {
-  const mDecl: MethodDeclaration = {
+export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | null {
+  const mDecl: MethodDetails = {
     name: '', isPrivate: false, parameters: undefined, returnType: undefined
   };
   enum STATES { START, NAME, PARAMS, RETURN };
@@ -139,7 +139,7 @@ export function isPrivateMethod(decl: ts.Node | null): boolean {
 }
 
 // Method name, params and return type
-export function findGetterDeclaration(source: ts.Node): MethodDeclaration | null {
+export function findGetterDeclaration(source: ts.Node): MethodDetails | null {
   const getterDecl = parse.findFirstNode(source, ts.SyntaxKind.GetAccessor);
   const decl = findMethodDeclaration(getterDecl);
   return decl ? decl : null;
