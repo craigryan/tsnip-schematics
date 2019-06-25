@@ -16,10 +16,11 @@ describe('Parsing', () => {
 
   describe('in source file', () => {
 
-    fit('should find imports', () => {
+    it('should find imports', () => {
       const n: Array<any> = parse.findImportStatements(fileNode);
       expect(n).toBeTruthy();
-      expect(n.length).toEqual(4);
+      expect(n.length).toEqual(5);
+
       /*
         import { Injectable, Inject } from '@angular/core';
         import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
@@ -28,10 +29,46 @@ describe('Parsing', () => {
         import * as ts from 'typescript';
       */
       const i1 = n[0];
-      expect(i1.kind).toEqual(ts.SyntaxKind.ImportDeclaration);
+      const i2 = n[1];
+      const i3 = n[2];
+      const i4 = n[3];
+      const i5 = n[4];
       const i1Decl: parsei.ImportDetails = parsei.importDetails(i1);
+      const i2Decl: parsei.ImportDetails = parsei.importDetails(i2);
+      const i3Decl: parsei.ImportDetails = parsei.importDetails(i3);
+      const i4Decl: parsei.ImportDetails = parsei.importDetails(i4);
+      const i5Decl: parsei.ImportDetails = parsei.importDetails(i5);
+      expect(i1.kind).toEqual(ts.SyntaxKind.ImportDeclaration);
       expect(i1Decl).toBeTruthy();
+      expect(i2Decl).toBeTruthy();
+      expect(i3Decl).toBeTruthy();
+      expect(i4Decl).toBeTruthy();
+      expect(i5Decl).toBeTruthy();
+
+      expect(i1Decl.specifiers).toEqual('Injectable, Inject');
       expect(i1Decl.lib).toEqual('@angular/core');
+      expect(i1Decl.alias).toBeNull();
+      expect(i1Decl.importType).toEqual(parsei.ImportType.NAMED);
+
+      expect(i2Decl.specifiers).toEqual('HttpClient, HttpParams, HttpErrorResponse');
+      expect(i2Decl.lib).toEqual('@angular/common/http');
+      expect(i2Decl.alias).toBeNull();
+      expect(i2Decl.importType).toEqual(parsei.ImportType.NAMED);
+
+      expect(i3Decl.specifiers).toEqual('Observable, of');
+      expect(i3Decl.lib).toEqual('rxjs');
+      expect(i3Decl.alias).toBeNull();
+      expect(i3Decl.importType).toEqual(parsei.ImportType.NAMED);
+
+      expect(i4Decl.specifiers).toEqual('map');
+      expect(i4Decl.lib).toEqual('rxjs/operators');
+      expect(i4Decl.alias).toBeNull();
+      expect(i4Decl.importType).toEqual(parsei.ImportType.NAMED);
+
+      expect(i5Decl.specifiers).toBeNull();
+      expect(i5Decl.lib).toEqual('typescript');
+      expect(i5Decl.alias).toEqual('ts');
+      expect(i5Decl.importType).toEqual(parsei.ImportType.NAMESPACE);
     });
     it('should find class declaration', () => {
       const n = parse.findClassDeclaration(fileNode);
@@ -90,7 +127,6 @@ describe('Parsing', () => {
       const methods: Array<any> = parsec.findClassMethods(fileNode, true);
       const firstMethod = methods[0];
       const n: parsem.MethodDetails = parsem.findMethodDeclaration(firstMethod);
-      // console.log('t decl', n);
       expect(n).toBeTruthy();
       expect(n.name).toBeTruthy();
       expect(n.name).toEqual('getApiResponse');

@@ -10,7 +10,10 @@ import {
 import * as ts from 'typescript';
 
 export enum ImportType {
-  NAMED, NAMESPACE, EXTERNAL, STRING
+  NAMED = "NAMED",
+  NAMESPACE = "NAMESPACE",
+  EXTERNAL = "EXTERNAL",
+  STRING = "STRING"
 };
 
 export interface ImportDetails {
@@ -31,10 +34,10 @@ export function importDetails(importNode: ImportDeclaration | ImportEqualsDeclar
   if (ts.isImportDeclaration(importNode)) {
     if (importNode.importClause && ts.isNamespaceImport(importNode.importClause.namedBindings)) {
       namespaceImport(details, importNode);
-    } else if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
-      stringImport(details, importNode);
     } else if (importNode.importClause && (ts.isNamedImports(importNode.importClause.namedBindings) || importNode.importClause.name)) {
       namedImport(details, importNode);
+    } else if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
+      stringImport(details, importNode);
     }
   } else if (ts.isExternalModuleReference(importNode.moduleReference)) {
     externalModuleImport(details, importNode.name.text, importNode.moduleReference);
@@ -53,8 +56,7 @@ function namedImport(details: ImportDetails, node: ImportDeclaration) {
   if (node.importClause.namedBindings) {
     const bindings = node.importClause.namedBindings as NamedImports;
     const specifiers: Array<string> = [];
-    bindings.elements.map(
-      o => {
+    bindings.elements.map(o => {
         let spec: string, alias: string;
         if (o.propertyName && o.name) {
           spec = o.propertyName.text;
