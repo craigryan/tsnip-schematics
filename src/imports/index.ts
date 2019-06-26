@@ -5,12 +5,11 @@ import {
 } from '@angular-devkit/schematics';
 // import {constants} from '../utils/constants';
 
-export function serviceSchematics(options: any): Rule {
+export function importsSchematics(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    const node = tsSource('.' + options.path + '/' + options.name);
-    console.log('-- service schema');
+    console.log('-- imports schema');
 
-    // service stuff
+    // imports stuff
 
     return tree;
   };

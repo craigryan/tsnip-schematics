@@ -10,6 +10,11 @@
       "description": "Service schematics.",
       "factory": "./service/index#serviceSchematics",
       "schema": "./service/schema.json"
+    },
+    "imports": {
+      "description": "Import statement schematics.",
+      "factory": "./imports/index#importsSchematics",
+      "schema": "./imports/schema.json"
     }
   }
 }
