@@ -7,7 +7,7 @@ import {
 
 export function importsSchematics(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    console.log('-- imports schema');
+    console.log('-- imports schema, options: ', options);
 
     // imports stuff
 
