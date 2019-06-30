@@ -10,15 +10,15 @@ import {createTestApp} from '../utils/test-app';
 const collectionPath = path.join(__dirname, '../collection.json');
 
 /*
-Test:
+Test which uses asyncs:
   https://github.com/angular/universal/blob/master/modules/express-engine/schematics/install/index.spec.ts
-Using async create util:
+Provide async create util used by the test:
   https://github.com/angular/universal/blob/master/modules/express-engine/schematics/testing/test-app.ts
 */
-fdescribe('imports schematic', () => {
+describe('imports schematic', () => {
 
   const appOptions: ApplicationOptions = {
-    name: 'tsnip',
+    name: 'test',
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
@@ -30,13 +30,23 @@ fdescribe('imports schematic', () => {
   let appTree: Tree;
 
   beforeEach(async () => {
-    testRunner = new SchematicTestRunner('tsnip-schematic', collectionPath);
-    appTree = await createTestApp(testRunner, appOptions).toPromise();
+    testRunner = new SchematicTestRunner('schematics', collectionPath);
   });
-  describe('', () => {
-  describe('with project', () => {
+
+  describe('without tree', () => {
     it('should complete with missing tree', async() => {
-      const tree = await testRunner.runSchematicAsync('imports', {name: 'test-service'}, Tree.empty());
+      const tree = await testRunner.runSchematicAsync('imports', {name: 'test.service.ts'}, Tree.empty());
+      expect(tree).toBeTruthy();
+    });
+  });
+
+  describe('with tree', () => {
+    beforeEach(async () => {
+      appTree = await createTestApp(testRunner, appOptions).toPromise();
+    });
+
+    it('should complete with valid tree', async() => {
+      const tree = await testRunner.runSchematicAsync('imports', {name: 'test.service.ts'}, appTree).toPromise();
       expect(tree).toBeTruthy();
     });
   });

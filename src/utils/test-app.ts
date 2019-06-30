@@ -8,11 +8,11 @@ export function createTestApp(baseRunner: SchematicTestRunner, appOptions = {}):
     .runExternalSchematicAsync('@schematics/angular', 'workspace', {
       name: 'workspace',
       version: '6.0.0',
-      newProjectRoot: 'projects',
+      newProjectRoot: '',
     })
     .pipe(
       switchMap(workspaceTree => baseRunner.runExternalSchematicAsync(
         '@schematics/angular', 'application',
-        {...appOptions, name: 'bar'}, workspaceTree)),
+        {...appOptions}, workspaceTree)),
     );
 }

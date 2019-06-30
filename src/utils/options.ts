@@ -26,6 +26,7 @@ export function setupOptions(host: Tree, options: any): Tree {
   const parsedPath = parseName(options.path, options.name);
   options.name = parsedPath.name;
   options.path = parsedPath.path;
+  console.log('-- setup options path, name', options.path, options.name);
   options.isService = options.name.endsWith(constants.serviceFileExtension);
   options.isComponent = options.isService ? false : options.name.endsWith(constants.componentFileExtension);
   return host;

@@ -14,9 +14,10 @@ import {
 } from '@angular-devkit/schematics';
 // import {constants} from '../utils/constants';
 import {getWorkspace} from '@schematics/angular/utility/config';
+import * as ts from 'typescript';
 import { tsSource } from '../ts/source';
 import * as parse from '../ts/parse';
-import * as ts from 'typescript';
+import {setupOptions} from '../utils/options';
 import * as parsei from '../ts/parse-import';
 
 function getRequiredTestImports(details: parsei.ImportDetails): string[] {
@@ -38,6 +39,7 @@ function addRequiredImports(options: any) {
 
 export function importsSchematics(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
+    setupOptions(tree, options);
     console.log('-- imports schema, options: ', options);
 
     const workspace = getWorkspace(tree);
