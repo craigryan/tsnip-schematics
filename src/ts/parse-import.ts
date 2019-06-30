@@ -17,6 +17,7 @@ export enum ImportType {
 };
 
 export interface ImportDetails {
+  originalImport: string;
   importType?: ImportType;
   lib: string;
   specifiers?: string;
@@ -26,6 +27,7 @@ export interface ImportDetails {
 // Import x from y, return x and y details
 export function importDetails(importNode: ImportDeclaration | ImportEqualsDeclaration): ImportDetails {
   let details: ImportDetails = {
+    originalImport: importNode.getText(),
     lib: '',
     importType: null,
     specifiers: null,

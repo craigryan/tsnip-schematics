@@ -45,6 +45,7 @@ describe('Parsing', () => {
       expect(i4Decl).toBeTruthy();
       expect(i5Decl).toBeTruthy();
 
+      expect(i1Decl.originalImport).toEqual('import { Injectable, Inject } from \'@angular/core\';');
       expect(i1Decl.specifiers).toEqual('Injectable, Inject');
       expect(i1Decl.lib).toEqual('@angular/core');
       expect(i1Decl.alias).toBeNull();
