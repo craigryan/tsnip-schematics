@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "name": {
-      "description": "The name of the component/service ",
+      "description": "The path and name of the component/service",
       "type": "string",
       "$default": {
         "$source": "argv",

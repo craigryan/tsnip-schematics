@@ -18,7 +18,7 @@ Provide async create util used by the test:
 describe('imports schematic', () => {
 
   const appOptions: ApplicationOptions = {
-    name: 'test',
+    name: 'tsnip',
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
@@ -35,7 +35,7 @@ describe('imports schematic', () => {
 
   describe('without tree', () => {
     it('should complete with missing tree', async() => {
-      const tree = await testRunner.runSchematicAsync('imports', {name: 'test.service.ts'}, Tree.empty());
+      const tree = await testRunner.runSchematicAsync('imports', {name: './test/test.service.ts'}, Tree.empty());
       expect(tree).toBeTruthy();
     });
   });
@@ -46,7 +46,7 @@ describe('imports schematic', () => {
     });
 
     it('should complete with valid tree', async() => {
-      const tree = await testRunner.runSchematicAsync('imports', {name: 'test.service.ts'}, appTree).toPromise();
+      const tree = await testRunner.runSchematicAsync('imports', {name: './test/test.service.ts'}, appTree).toPromise();
       expect(tree).toBeTruthy();
     });
   });
