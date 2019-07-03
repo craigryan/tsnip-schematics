@@ -54,11 +54,8 @@ function addRequiredImports(options: any): Rule {
 export function importsSchematics(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
     setupOptions(tree, options);
-    console.log('-- imports schema, options: ', options);
-    console.log('-- normalise test', normalize(options.name));
     const workspace = getWorkspace(tree);
     const project = workspace.projects[options.project];
-    const importsPath = join(project.root as Path, 'public');
 
     const defaultOptions = {
       libraries: getReferencedLibraries(options),
@@ -71,12 +68,11 @@ export function importsSchematics(options: any): Rule {
       ...options
     };
 
-    // imports stuff
     const rule = chain([
       addRequiredImports(options),
       mergeWith(apply(url('./files'), [
         template(templateOptions),
-        move(importsPath),
+        move(options.outputPath),
       ]), MergeStrategy.Overwrite)
     ]);
 
