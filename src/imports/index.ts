@@ -30,16 +30,12 @@ function getReferencedLibraries(details: parsei.ImportDetails) {
 
 function addRequiredImports(options: any): Rule {
   return (tree: Tree) => {
-    let sourcePath = tsSourceExists(options.name) ? options.name : null;
+    let sourcePath = tsSourceExists(options.sourcePath) ? options.sourcePath : null;
     if (!sourcePath) {
-      sourcePath = tsSourcePathExists(options.path, options.name) ? join(options.path, options.name) : null;
-    }
-    const x = join(options.path, options.name);
-    if (!sourcePath) {
-      console.log('-- source[path] doesnt exist: path, name', x);
+      console.log('-- source[path] doesnt exist:', options.sourcePath);
       return tree;
     }
-    let srcNode: ts.Node = tsSource(options.name);
+    let srcNode: ts.Node = tsSource(options.sourcePath);
     const imports: Array<any> = parse.findImportStatements(srcNode);
     options.imports = [];
     imports.forEach((i) => {
