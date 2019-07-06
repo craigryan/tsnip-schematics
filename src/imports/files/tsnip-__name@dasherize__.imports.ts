@@ -17,4 +17,4 @@ import {MockNgRedux, NgReduxTestingModule} from '@angular-redux/store/lib/testin
 <%   } %>
 <% } %>
 
-import { <%= classify(name) %>Service } from './<%= dasherize(name) %>.service';
+import { <%= classify(className) %>Service } from './<%= dasherize(name) %>';

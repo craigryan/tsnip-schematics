@@ -55,8 +55,9 @@ describe('imports schematic', () => {
       testRunner.runSchematicAsync('imports', {name: './test/test.service.ts'}, appTree).toPromise().then(tree => {
         const files = tree.files;
         expect(files).toBeTruthy();
-        // console.log(JSON.stringify(tree.files, undefined, 2));
-        // tree.readContent('/projects/schematest/src/app/app.component.ts'); 
+        console.log(JSON.stringify(tree.files, undefined, 2));
+        const x = tree.readContent('/public/tsnip-test.service.ts.imports.ts');
+        console.log(x);
         //expect(appComponent).toContain(`name = '${schemaOptions.name}'`); 
       });
     });

@@ -19,13 +19,15 @@ import { tsSource, tsSourceExists, tsSourcePathExists } from '../ts/source';
 import * as parse from '../ts/parse';
 import {setupOptions} from '../utils/options';
 import * as parsei from '../ts/parse-import';
+import ( ImportMaps as importMaps } from '../utils/import-maps';
 
 function getRequiredTestImports(details: parsei.ImportDetails): string[] {
-  return ['import foo from \'bar\''];
 }
 
-function getReferencedLibraries(details: parsei.ImportDetails) {
-  return ['commonhttp'];
+function getReferencedLibraries(details: parsei.ImportDetails): string[] {
+  const imports: Array<string> = string[];
+  importMaps.addMaps(imports, details.lib);
+  return imports;
 }
 
 function addRequiredImports(options: any): Rule {
@@ -66,10 +68,13 @@ export function importsSchematics(options: any): Rule {
 
     const rule = chain([
       addRequiredImports(options),
-      mergeWith(apply(url('./files'), [
-        template(templateOptions),
-        move(options.outputPath),
-      ]), MergeStrategy.Overwrite)
+      mergeWith(
+        apply(url('./files'), [
+          template(templateOptions),
+          move(options.outputPath),
+        ]),
+        MergeStrategy.Overwrite
+      )
     ]);
 
     return rule(tree, context);

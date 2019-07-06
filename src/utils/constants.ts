@@ -5,6 +5,6 @@ export const constants = {
   serviceSchematic: 'service',
   componentSchematic: 'component',
 
-  serviceFileExtension: '.service.ts',
-  componentFileExtension: '.component.ts'
+  serviceFileExtension: '.service',
+  componentFileExtension: '.component'
 }
