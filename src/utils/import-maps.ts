@@ -1,7 +1,11 @@
 /**
- * Map standard imports (such as redux) to an external module identifier used to trigger specific test imports.
+ * Group standard imports by a common key
  */
-export const StandardImports = {
+interface ImportType {
+  [lib: string]: string
+};
+
+export const StandardImports: ImportType = {
 	'@angular/common/http': 'commonhttp',
 	'@angular-redux/store': 'redux-store',
 	'@angular-redux/.*': 'redux',
@@ -11,13 +15,13 @@ export const StandardImports = {
 
 export class ImportMaps {
 
-  static addMaps(map: Array<String>, name: string): void {
+  static addLibraries(map: Array<String>, name: string): void {
 	Object.keys(StandardImports)
 	  .filter(key => {
 		return name.match(new RegExp(key));
 	  }).forEach(key => {
 		// console.log('-- map  ' + key + ' to ' + StandardImports[key]);
-		const newKey = StandardImports[key];
+		const newKey: string = StandardImports[key];
 		if (!map.includes(newKey)) {
 		  map.push(newKey);
 		}

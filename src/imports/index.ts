@@ -19,18 +19,21 @@ import { tsSource, tsSourceExists, tsSourcePathExists } from '../ts/source';
 import * as parse from '../ts/parse';
 import {setupOptions} from '../utils/options';
 import * as parsei from '../ts/parse-import';
-import ( ImportMaps as importMaps } from '../utils/import-maps';
+import { ImportMaps } from '../utils/import-maps';
 
 function getRequiredTestImports(details: parsei.ImportDetails): string[] {
-}
-
-function getReferencedLibraries(details: parsei.ImportDetails): string[] {
-  const imports: Array<string> = string[];
-  importMaps.addMaps(imports, details.lib);
+  const imports: Array<string> = [];
+  imports.push(details.originalImport);
   return imports;
 }
 
-function addRequiredImports(options: any): Rule {
+function getReferencedLibraries(details: parsei.ImportDetails): string[] {
+  const libraries: Array<string> = [];
+  ImportMaps.addLibraries(libraries, details.lib);
+  return libraries;
+}
+
+function addImportsAndLibraries(options: any): Rule {
   return (tree: Tree) => {
     let sourcePath = tsSourceExists(options.sourcePath) ? options.sourcePath : null;
     if (!sourcePath) {
@@ -40,9 +43,10 @@ function addRequiredImports(options: any): Rule {
     let srcNode: ts.Node = tsSource(options.sourcePath);
     const imports: Array<any> = parse.findImportStatements(srcNode);
     options.imports = [];
+    options.libraries = [];
     imports.forEach((i) => {
       const details: parsei.ImportDetails = parsei.importDetails(i);
-      options.imports.push(details.originalImport);
+      options.libraries = options.libraries.concat(getReferencedLibraries(details));
       options.imports = options.imports.concat(getRequiredTestImports(details));
     });
     return tree;
@@ -55,25 +59,17 @@ export function importsSchematics(options: any): Rule {
     const workspace = getWorkspace(tree);
     const project = workspace.projects[options.project];
 
-    const defaultOptions = {
-      libraries: getReferencedLibraries(options),
-      requiredImports: getRequiredTestImports(options)
-    };
-
-    const templateOptions = {
-      ...strings,
-      ...defaultOptions,
-      ...options
-    };
-
+    console.log('-- add imports options', options);
     const rule = chain([
-      addRequiredImports(options),
+      addImportsAndLibraries(options),
       mergeWith(
         apply(url('./files'), [
-          template(templateOptions),
+          template({
+            ...strings, ...options
+          }),
           move(options.outputPath),
         ]),
-        MergeStrategy.Overwrite
+        MergeStrategy.Default
       )
     ]);
 

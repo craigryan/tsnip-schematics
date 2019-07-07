@@ -11,8 +11,8 @@ import {MockNgRedux, NgReduxTestingModule} from '@angular-redux/store/lib/testin
 
 <%# Imports present in the source under test, include these in the test .spec.ts also %>
 
-<% if (requiredImports) { %>
-<%   for (let rimport of requiredImports) { %>
+<% if (imports) { %>
+<%   for (let rimport of imports) { %>
 <%= rimport %>
 <%   } %>
 <% } %>

@@ -1,7 +1,9 @@
 /**
  * Map standard method calls to a key used to generate expect clauses.
  */
-const StandardCalls = {
+interface CallType { [key: string]: Array<string> };
+
+const StandardCalls: CallType = {
   'this.http.get': [
 	'http.get', "toHaveBeenCalledWith('')"
   ],
@@ -21,17 +23,19 @@ const StandardCalls = {
 
 class MethodCallMaps {
 
-  static addMaps(map, name) {
+  static addMaps(map: CallType, name: string) {
 	// console.log('-- add call maps for ' + name);
 	Object.keys(StandardCalls)
 	  .filter(key => {
 		return name.match(new RegExp(key));
 	  }).forEach(key => {
         //			console.log('-- mapped  ' + key + ' to ' + StandardCalls[key]);
-		const newKey = StandardCalls[key];
+		const newKey: Array<string> = StandardCalls[key];
+          /*
 		if (!map.includes(newKey)) {
 		  map.push(newKey);
 		}
+          */
 	  });
   }
 }
