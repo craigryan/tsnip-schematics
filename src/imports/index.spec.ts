@@ -31,34 +31,43 @@ describe('imports schematic', () => {
 
   beforeEach(async () => {
     testRunner = new SchematicTestRunner('schematics', collectionPath);
+    appTree = await createTestApp(testRunner, appOptions).toPromise();
   });
 
-  describe('without tree', () => {
-    xit('should complete with missing tree', () => {
+  describe('with bad inputs', () => {
+    it('should fail with missing tree', () => {
       let caught = false;
       testRunner.runSchematicAsync('imports', {name: './test/test.service.ts'}, Tree.empty()).toPromise()
         .then(ex => {
-        // unexpected
+          fail('expected to fail because of empty tree');
         }).catch((ex) => {
-          caught = true;
+          // expected
         });
-      expect(caught).toBe(true);
+    });
+    it('should fail with missing parameters', () => {
+      let caught = false;
+      testRunner.runSchematicAsync('imports', {}, appTree).toPromise()
+        .then(ex => {
+          // unexpected
+          fail('expected to fail because of missing parameters');
+        }).catch((ex) => {
+          // expected
+        });
     });
   });
 
-  describe('with tree', () => {
-    beforeEach(async () => {
-      appTree = await createTestApp(testRunner, appOptions).toPromise();
-    });
+  describe('with valid inputs', () => {
 
-    it('should complete with valid tree', () => {
-      testRunner.runSchematicAsync('imports', {name: './test/test.service.ts'}, appTree).toPromise().then(tree => {
+    it('should generate import snippet', () => {
+      testRunner.runSchematicAsync('imports', {name: 'test.service', path: './test'}, appTree).toPromise().then(tree => {
         const files = tree.files;
         expect(files).toBeTruthy();
-        console.log(JSON.stringify(tree.files, undefined, 2));
-        const x = tree.readContent('/public/tsnip-test.service.ts.imports.ts');
-        console.log(x);
-        //expect(appComponent).toContain(`name = '${schemaOptions.name}'`); 
+        // const x = 
+        expect(files).toContain('/public/tsnip-test.service.imports.ts');
+        expect(tree.readContent('/public/tsnip-test.service.imports.ts'))
+          .toContain('import {HttpClientTestingModule, HttpTestingController} from \'@angular/common/http/testing\';');
+        expect(tree.readContent('/public/tsnip-test.service.imports.ts'))
+          .toContain('import { TestService } from \'./test.service\';');
       });
     });
   });

@@ -9,8 +9,6 @@ import {HttpClientTestingModule, HttpTestingController} from '@angular/common/ht
 import {MockNgRedux, NgReduxTestingModule} from '@angular-redux/store/lib/testing';
 <%# } %>
 
-imports are <%= imports %>
-
 <%# Imports present in the source under test, include these in the test .spec.ts also %>
 
 <% if (imports) { %>
