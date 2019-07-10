@@ -33,24 +33,22 @@ function getReferencedLibraries(details: parsei.ImportDetails): string[] {
   return libraries;
 }
 
-function addImportsAndLibraries(options: any): Rule {
-  return (tree: Tree) => {
-    let sourcePath = tsSourceExists(options.sourcePath) ? options.sourcePath : null;
-    if (!sourcePath) {
-      console.log('-- source[path] doesnt exist:', options.sourcePath);
-      return tree;
-    }
-    let srcNode: ts.Node = tsSource(options.sourcePath);
-    const imports: Array<any> = parse.findImportStatements(srcNode);
-    options.imports = [];
-    options.libraries = [];
-    imports.forEach((i) => {
-      const details: parsei.ImportDetails = parsei.importDetails(i);
-      options.libraries = options.libraries.concat(getReferencedLibraries(details));
-      options.imports = options.imports.concat(getRequiredTestImports(details));
-    });
-    return tree;
-  };
+function addImportsAndLibraries(options: any): void {
+  let sourcePath = tsSourceExists(options.sourcePath) ? options.sourcePath : null;
+  if (!sourcePath) {
+    console.log('-- source[path] doesnt exist:', options.sourcePath);
+    return;
+  }
+  let srcNode: ts.Node = tsSource(options.sourcePath);
+  const imports: Array<any> = parse.findImportStatements(srcNode);
+  options.imports = [];
+  options.libraries = [];
+  imports.forEach((i) => {
+    const details: parsei.ImportDetails = parsei.importDetails(i);
+    options.libraries = options.libraries.concat(getReferencedLibraries(details));
+    options.imports = options.imports.concat(getRequiredTestImports(details));
+  });
+  console.log('--- first')
 }
 
 export function importsSchematics(options: any): Rule {
@@ -59,11 +57,20 @@ export function importsSchematics(options: any): Rule {
     const workspace = getWorkspace(tree);
     const project = workspace.projects[options.project];
 
-    console.log('-- add imports options', options);
+    addImportsAndLibraries(options);
+
+    console.log('-- added imports to options', options);
+
     const rule = chain([
-      addImportsAndLibraries(options),
       mergeWith(
         apply(url('./files'), [
+          (tree: Tree, _context: SchematicContext) => {
+            const x = {
+              ...strings, ...options
+            };
+            console.log('--- last, options', x);
+            return tree;
+          },
           template({
             ...strings, ...options
           }),

@@ -2,12 +2,14 @@
 import {TestBed, inject, fakeAsync, ComponentFixture} from '@angular/core/testing';
 import {DebugElement, Injectable, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA} from '@angular/core';
 
-<% if (libraries && libraries.includes('commonhttp')) { %>
+<%# if (libraries && libraries.includes('commonhttp')) { %>
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-<% } %>
-<% if (libraries && libraries.includes('redux')) { %>
+<%# } %>
+<%# if (libraries && libraries.includes('redux')) { %>
 import {MockNgRedux, NgReduxTestingModule} from '@angular-redux/store/lib/testing';
-<% } %>
+<%# } %>
+
+imports are <%= imports %>
 
 <%# Imports present in the source under test, include these in the test .spec.ts also %>
 
