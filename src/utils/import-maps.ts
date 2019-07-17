@@ -6,11 +6,13 @@ interface ImportType {
 };
 
 export const StandardImports: ImportType = {
-	'@angular/common/http': 'commonhttp',
-	'@angular-redux/store': 'redux-store',
-	'@angular-redux/.*': 'redux',
-    'rxjs/.*': 'redux',
-    '@angular/router': 'router'
+  '@angular/common/http': 'commonhttp',
+  '@angular-redux/store': 'redux-store',
+  '@angular-redux/.*': 'redux',
+  '@angular/forms': 'forms',
+  'rxjs/.*': 'redux',
+  '@ngrx/.*': 'ngrx',
+  '@angular/router': 'router'
 };
 
 export class ImportMaps {

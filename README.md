@@ -57,4 +57,25 @@ npm run build
 npm publish
 ```
 
-That's it!
+## Template parameters
+
+Variables recognised within the templates.
+
+. __sourcePath__: full rel path, eg 'test/test.service.ts',
+. __name__: file name less extent eg 'test.service'
+. __path__: dir name eg 'test'
+. __outputPath__: to store generated output in. eg './public'
+. __isService__: boolean
+. __isComponent__: boolean
+. __className__: name of class, less suffix (eg 'test' without the 'Service')
+. __libraries__: standard groups of libs [ 'commonhttp', 'redux' ] etc
+  
+### Services
+
+. __mocks__ (.type): user mock class names less 'Mock' prefix
+. __standardMocks__ (array): standard module mocks
+. __imports__ (array): standard module mock libraries
+. __lets__ ([].decl, .name, .type, .value): test wide let variables
+. __beforeeach__ (.providers[].provide, .useClass): configureTestingModule providers
+. __beforeeach__ (.imports[]): configureTestingModule imports
+

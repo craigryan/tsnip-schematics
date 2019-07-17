@@ -13,7 +13,6 @@ import { tsSource, showTree } from '../ts/source';
 export function tsnip(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
     setupOptions(tree, options);
-    console.log('IN tsnip schematics2, name path', options.name, options.path);
 
     const node = tsSource(options.sourcePath);
     if (node) {
