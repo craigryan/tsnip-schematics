@@ -21,7 +21,8 @@ export interface ImportDetails {
   importType?: ImportType;
   lib: string;
   specifiers?: string;
-  alias?: string
+  alias?: string,
+  node: ts.Node
 };
 
 // Import x from y, return x and y details
@@ -31,7 +32,8 @@ export function importDetails(importNode: ImportDeclaration | ImportEqualsDeclar
     lib: '',
     importType: null,
     specifiers: null,
-    alias: null
+    alias: null,
+    node: importNode
   };
   if (ts.isImportDeclaration(importNode)) {
     if (importNode.importClause && ts.isNamespaceImport(importNode.importClause.namedBindings)) {

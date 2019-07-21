@@ -104,6 +104,26 @@ describe('Parsing', () => {
       expect(n.kind).toBeTruthy();
       expect(n.kind).toEqual(ts.SyntaxKind.Constructor);
     });
+    fit('should find constructor parameters', () => {
+      const n = parsec.findClassConstructor(fileNode);
+      const p = parsec.findConstructorParameters(n);
+      expect(p).toBeTruthy();
+      expect(p.params).toBeTruthy();
+      expect(p.params.length).toBe(3);
+      const p1 = p.params[0];
+      const p2 = p.params[1];
+      const p3 = p.params[2];
+      expect(p1.typeReference).toEqual('HttpClient');
+      expect(p1.name).toEqual('http');
+      expect(p1.isPrivate).toBe(true);
+      expect(p2.typeReference).toEqual('MyType');
+      expect(p2.name).toEqual('myType');
+      expect(p2.isPrivate).toBe(true);
+      expect(p3.typeReference).toEqual('string');
+      expect(p3.name).toEqual('url');
+      expect(p3.isPrivate).toBe(false);
+      expect(p3.injectedBy).toEqual('TestConstants.url');
+    });
     it('should find public methods', () => {
       const n: Array<any> = parsec.findClassMethods(fileNode, true);
       expect(n).toBeTruthy();

@@ -8,7 +8,8 @@ import * as ast from '@schematics/angular/utility/ast-utils';
 // Param or field declaration (name: type)
 export interface DeclarationDetails {
   name: string;
-  typedTo: string;
+  typeReference: string;
+  node: ts.Node;
 }
 
 // import * as fs from 'fs';
@@ -47,7 +48,8 @@ export function findImportStatements(source: ts.Node): ts.Node[] {
 export function declarationDetails(declNode: ts.Node): DeclarationDetails {
   let det: DeclarationDetails = {
     name: '',
-    typedTo: ''
+    typeReference: '',
+    node: declNode
   };
   return det;
 }
@@ -94,4 +96,23 @@ export function findFirstNode(node: ts.Node, kind: ts.SyntaxKind): ts.Node | nul
 
 export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = 100): ts.Node[] {
   return ast.findNodes(node, kind, max);
+}
+
+export function isStandardType(type: string): boolean {
+    return isBasicType(type) || isArrayType(type) || isGenericType(type);
+  }
+
+export function isBasicType(type: string): boolean {
+  return type === 'string' || type === 'number' || type === 'any' || type === 'boolean';
+}
+
+export function isArrayType(type: string): boolean {
+  if (type.startsWith('Array') || type.includes('[')) {
+    return true;
+  }
+  return false;
+}
+
+export function isGenericType(type: string): boolean {
+  return type.includes('<');
 }

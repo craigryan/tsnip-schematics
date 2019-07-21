@@ -45,7 +45,10 @@ export interface MethodDetails {
 // Method name, params and return type
 export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | null {
   const mDecl: MethodDetails = {
-    name: '', isPrivate: false, parameters: undefined, returnType: undefined
+    name: '',
+    isPrivate: false,
+    parameters: [],
+    returnType: undefined
   };
   enum STATES { START, NAME, PARAMS, RETURN };
   let state: STATES = STATES.START;

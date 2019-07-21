@@ -11,6 +11,8 @@ export const StandardImports: ImportType = {
   '@angular-redux/.*': 'redux',
   '@angular/forms': 'forms',
   'rxjs/.*': 'redux',
+  'rxjs': 'redux',
+  '@ngrx/store': 'ngrx-store',
   '@ngrx/.*': 'ngrx',
   '@angular/router': 'router'
 };
@@ -18,6 +20,7 @@ export const StandardImports: ImportType = {
 export class ImportMaps {
 
   static addLibraries(map: Array<String>, name: string): void {
+    // console.log('-- imp match name', name);
 	Object.keys(StandardImports)
 	  .filter(key => {
 		return name.match(new RegExp(key));

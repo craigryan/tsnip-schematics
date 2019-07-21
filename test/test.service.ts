@@ -1,11 +1,19 @@
 import { Injectable, Inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
+import {select} from '@angular-redux/store';
+
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import * as ts from 'typescript';
 
+import {TestConstants} from './test.constants';
+
 interface ApiResponse {
   stringValue: string
+}
+
+class MyType {
+  typeName: String;
 }
 
 @Injectable({
@@ -13,9 +21,15 @@ interface ApiResponse {
 })
 export class TestService {
 
-  private apiUrl: string;
+  @select() readonly searchEnabled$: Observable<boolean>;
 
-  constructor(private http: HttpClient, private url: string) {
+  private apiUrl: string;
+  searchEnabled: boolean;
+
+  constructor(
+    private http: HttpClient,
+    private myType: MyType,
+    @Inject(TestConstants.url) url: string) {
     this.apiUrl = url;
   }
 
@@ -29,7 +43,9 @@ export class TestService {
       this.secretMethod(url);
     }
     requestArguments.headers['x-stuff'] = 'api';
-
+    if (this.searchEnabled) {
+      requestArguments.headers['x-search'] = 'on';
+    }
     return this.http.get<ApiResponse>(url, requestArguments)
       .pipe(
         map(response => {
@@ -49,5 +65,10 @@ export class TestService {
 
   private secretMethod(url: string) {
     // do stuff with secret params
+  }
+
+  private searchEnabledSubscribe(): Observable<boolean> {
+    return this.searchEnabled$
+      .first((enabled) => !!enabled).map(() => this.searchEnabled = true);
   }
 }

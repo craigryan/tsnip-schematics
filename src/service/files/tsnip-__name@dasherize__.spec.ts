@@ -2,7 +2,7 @@
 <% if (mocks) { %>
 <% mocks.forEach((mock) => { %>
 @Injectable()
-class Mock<% mock.type %> {
+class Mock<% mock.typeReference %> {
   // mocked methods go here..
 }
 <% }); %>
@@ -12,17 +12,12 @@ class Mock<% mock.type %> {
 @Injectable()
 class MockRouter {
   navigate(commands: any[], extras?: any) {}
-  <% if (imports.exports.includes('NavigationEnd')) { %>
-  public events = Observable.of( new NavigationEnd(0, 'http://localhost:4200/home', 'http://localhost:4200/home'));
-  <% } else if (imports.exports.includes('NavigationStart')) { %>
-  public events = Observable.of( new NavigationStart(0, 'http://localhost:4200/home'));
-  <% } %>
 }
 <% } %>
 
 describe('<%= classify(className) %>Service test', () => {
 
-  let service;
+  let service: <%= classify(className) %>Service;
 
 <% if (lets) { %>
 <% lets.forEach((xlet) => { %>
@@ -30,7 +25,6 @@ describe('<%= classify(className) %>Service test', () => {
 <% }); %>
 <% } %>
 
-<% if (beforeeach) { %>
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -55,7 +49,6 @@ describe('<%= classify(className) %>Service test', () => {
 
     service = TestBed.get(<%= classify(className) %>Service);
   });
-<% } %>
 
   beforeEach(() => {
     <% if (mocks) { %>

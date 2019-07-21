@@ -15,9 +15,12 @@ export function tsnip(options: any): Rule {
     setupOptions(tree, options);
 
     const node = tsSource(options.sourcePath);
+    /*
     if (node) {
-      // showTree(node);
+      showTree(node);
     }
+    */
+
     const rule = chain([
       options.isService ? schematic(constants.serviceSchematic, options) : noop()
     ]);
