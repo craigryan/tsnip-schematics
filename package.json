@@ -5,8 +5,8 @@
   "main": "/lib/tsnip/index.js",
   "types": "/lib/tsnip/index.d.ts",
   "files": [
-    "/lib/**/*",
-    "/src/*/files/**/*"
+    "lib/**/*",
+    "src/*/files/**/*"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",

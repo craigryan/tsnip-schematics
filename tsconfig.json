@@ -15,7 +15,6 @@
     "noImplicitThis": true,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
-    "rootDir": "src/",
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -30,8 +29,8 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/*/files/**/*",
-    "src/**/*.spec.ts",
+    "**/*.spec.ts",
+    "**/files/*",
     "node_modules"
   ]
 }
