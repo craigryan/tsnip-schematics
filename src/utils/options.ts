@@ -31,10 +31,31 @@ function setClassName(options: any) {
   // console.log('-- set class name', options.className);
 }
 
-function getRequiredTestImports(details: parsei.ImportDetails): string[] {
-  const imports: Array<string> = [];
-  imports.push(details.originalImport);
-  return imports;
+function addRequiredTestImports(options: any): void {
+  options.libraries.forEach((lib: string) => {
+    switch (lib) {
+    case 'commonhttp':
+      options.imports.push(
+        {imports: '{HttpClientTestingModule, HttpTestingController}', from: '@angular/common/http/testing'}
+      );
+      break;
+    case 'redux':
+      options.imports.push(
+        {imports: '{MockNgRedux, NgReduxTestingModule}', from: '@angular-redux/store/lib/testing'}
+      );
+      break;
+    case 'forms':
+      options.imports.push(
+        {imports: '{FormsModule, ReactiveFormsModule}', from: '@angular/forms'}
+      );
+      break;
+    case 'ngrx':
+      options.imports.push(
+        {imports: '{ provideMockStore, MockStore }', from: '@ngrx/store/testing'}
+      );
+      break;
+    }
+  });
 }
 
 function addReferencedLibraries(libs: Array<string>, details: parsei.ImportDetails): void {
@@ -61,8 +82,9 @@ export function addImportsAndLibraries(options: any): void {
     const details: parsei.ImportDetails = parsei.importDetails(i);
     // console.log('-- add import, lib', details.originalImport, details.lib);
     addReferencedLibraries(options.libraries, details);
-    options.imports = options.imports.concat(getRequiredTestImports(details));
+    options.imports.push(details.originalImport);
   });
+  addRequiredTestImports(options);
 }
 
 // Search the workspace (package.json) to determine the options path, file name and file type (service, component, etc)

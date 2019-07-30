@@ -6,30 +6,39 @@ Schematic implementation that generates snippets of test code for various Angula
 
 A typical call to `ng generate` includes the type being generated, eg `service` and the name for that type. To generate a service`myapi.service` the name will be `myapi`, eg:
 
-    $ ng g service myapi
+```bash
+ng g service myapi
+```
 
 In the case of tsnip the file already exists and the type is determined from it's name, therefore the name will be specified including the type, eg `myapi.service`:
 
-    $ ng g tsnip-schematics:tsnip --name=myapi.service
-    
+```bash
+ng g tsnip-schematics:tsnip --name=myapi.service
+```
+
 ## Run tsnip
 
 Running schematics searches in node_modules for packages, if not packaged yet use the relative path '.':
 
-    $ schematics .:tsnip-schematics
-    Nothing to be done. (means Tree was not modified)
+```bash
+schematics .:tsnip-schematics
+Nothing to be done. (means Tree was not modified)
+```
 
 (npm run build must have first been run to compile all .ts files into .js)
 
 From another project
 
-    $ schematics ../tsnip-schematics/src/collection.json:tsnip-schematics
+```bash
+schematics ../tsnip-schematics/src/collection.json:tsnip-schematics
+```
 
 ## Test by running over an existing angular app
 
 To test locally, install `@angular-devkit/schematics-cli` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
 
 Check the documentation with
+
 ```bash
 schematics --help
 ```
@@ -40,20 +49,46 @@ From the other project `npm link tsnip-schematics` to link tsnip into ./node_mod
 
 Run the schematics with a service source file to generate specs and imports:
 
-    $ ng g tsnip-schematics:tsnip --name=myapi.service
+```bash
+ng g tsnip-schematics:tsnip --name=myapi.service
+```
 
 Note: the name is relative to the default 'src/app' (or lib) project directory.
 
 ## Unit Testing
 
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
+```bash
+npm run test
+```
+will run the unit tests, using Jasmine as a runner and test framework.
 
 ## Publishing
+
+See this page for all project scripts
+
+https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c
+
+Get a npmjs.com login
+
+```bash
+npm adduser
+npm login
+```
 
 To publish, simply do:
 
 ```bash
-npm run build
+npm publish
+```
+
+See the published artefact, visit:
+
+https://npmjs.com/package/tsnip-schematics
+
+Bump new verion, then publish again
+
+```bash
+npm version patch
 npm publish
 ```
 

@@ -28,12 +28,13 @@ function addMocks(node: ts.Node, options: any): void {
   // mocks and standardMocks
   const ctor: ts.Node = parsec.findClassConstructor(node);
   const paramList: parsec.ParamList = parsec.findConstructorParameters(ctor);
-  console.log('-- paramList ', paramList);
   options.mocks = [];
   options.standardMocks = [];
   if (paramList.params.length > 0) {
-    paramList.params.forEach((p: parsec.ParamDetails) => {
-      // console.log('-- param ', p);
+    for (let i = 0; i < paramList.params.length; i++) {
+      const p: parsec.ParamDetails = paramList.params[i];
+      // TODO array push with node set causes RangeError from rxjs
+      p.node = null;
       if (!parse.isStandardType(p.typeReference)) {
         if (angular.Types.knownServiceType(p.typeReference)) {
           options.standardMocks.push(p);
@@ -41,7 +42,7 @@ function addMocks(node: ts.Node, options: any): void {
           options.mocks.push(p);
         }
       }
-    });
+    }
   }
 }
 
@@ -52,8 +53,8 @@ function addLets(node: ts.Node, options: any): void {
   //    let mockstore: MockStore<IMyType>;
   options.lets = [];
 
-  console.log('-- lets libaries', options.libraries);
-  console.log('-- lets mocks', options.mocks);
+//  console.log('-- lets libaries', options.libraries);
+//  console.log('-- lets mocks', options.mocks);
 
   if (options.libraries && options.libraries.includes('redux-store')) {
 	options.lets.push({decl: 'let', name: 'reduxDispatchSpy'});
@@ -77,17 +78,51 @@ function addLets(node: ts.Node, options: any): void {
   console.log('-- lets', options.lets);
 }
 
-function addBeforeEach(node: ts.Node, options: any): void {
+function addBeforeAndAfterEach(node: ts.Node, options: any): void {
   // top level beforeEach()
+  // -- lets libaries [ 'commonhttp', 'redux-store', 'redux' ]
   options.beforeeach = {
     providers: [],
-    imports: []
-  }
+    imports: [],
+    calls: []
+  };
+  options.aftereach = {
+    calls: []
+  };
   
+  for (let smock of options.standardMocks) {
+    switch (smock.typeReference) {
+    case 'HttpClient':
+      options.beforeeach.imports.push('HttpClientTestingModule');
+      options.beforeeach.imports.push('HttpClientModule');
+      options.beforeeach.calls.push('httpMock = TestBed.get(HttpTestingController);');
+      options.aftereach.calls.push('httpMock.verify()');
+      break;
+    }
+  }
+
+  for (let lib of options.libraries) {
+    switch (lib) {
+    case 'redux-store':
+      options.beforeeach.imports.push('NgReduxTestingModule');
+      options.beforeeach.calls.push('reduxDispatchSpy = spyOn(MockNgRedux.mockInstance, \'dispatch\'');
+      options.beforeeach.calls.push('reduxSelectSpy = spyOn(MockNgRedux.mockInstance, \'select\'');
+      options.beforeeach.calls.push('MockNgRedux.reset();');
+      break;
+    }
+  }
+
+  for (let mock of options.mocks) {
+	options.beforeeach.providers.push(
+      {provide: mock.typeReference, useClass: 'Mock' + mock.typeReference}
+    );
+  }
+
   // todo add provideMockStore({}) for ngrx
   // and     mockStore = TestBed.get(Store);
   // spyOn(mockStore, 'dispatch')
 }
+
 
 export function serviceSchematics(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
@@ -95,7 +130,7 @@ export function serviceSchematics(options: any): Rule {
 
     addMocks(node, options);
     addLets(node, options);
-    addBeforeEach(node, options);
+    addBeforeAndAfterEach(node, options);
 
     const rule = chain([
       schematic(constants.importsSchematic, options),

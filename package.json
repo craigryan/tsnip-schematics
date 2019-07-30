@@ -1,14 +1,27 @@
 {
   "name": "tsnip-schematics",
   "version": "0.0.0",
-  "description": "A schematics for generating Angular test snippets",
+  "description": "Schematics for generating smart Angular test snippets",
+  "main": "/lib/tsnip/index.js",
+  "types": "/lib/tsnip/index.d.ts",
+  "files": [
+    "/lib/**/*",
+    "/src/*/files/**/*"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
     "test": "npm-run-all -s build spec:nowatch",
     "test:watch": "npm-run-all -p build:watch spec:watch",
     "spec:nowatch": "jasmine-ts \"src/**/*.spec.ts\"",
-    "spec:watch": "nodemon --ext ts --delay 1 --exec node_modules/.bin/jasmine-ts \"src/**/*.spec.ts\""
+    "spec:watch": "nodemon --ext ts --delay 1 --exec node_modules/.bin/jasmine-ts \"src/**/*.spec.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "schematics",
@@ -34,6 +47,9 @@
     "nodemon": "^1.19.1",
     "npm-run-all": "^4.1.5",
     "nyc": "^14.1.1",
-    "ts-node": "^8.3.0"
+    "prettier": "^1.18.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0"
   }
 }

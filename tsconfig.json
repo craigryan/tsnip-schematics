@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "tsconfig",
+    "outDir": "./lib",
     "lib": [
       "es2018",
       "dom"
@@ -29,6 +30,8 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/*/files/**/*"
+    "src/*/files/**/*",
+    "src/**/*.spec.ts",
+    "node_modules"
   ]
 }

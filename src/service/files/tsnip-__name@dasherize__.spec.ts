@@ -2,7 +2,7 @@
 <% if (mocks) { %>
 <% mocks.forEach((mock) => { %>
 @Injectable()
-class Mock<% mock.typeReference %> {
+class Mock<%= mock.typeReference %> {
   // mocked methods go here..
 }
 <% }); %>
@@ -21,45 +21,59 @@ describe('<%= classify(className) %>Service test', () => {
 
 <% if (lets) { %>
 <% lets.forEach((xlet) => { %>
-  <% xlet.decl %> <% xlet.name %> <% if (xlet.type){ %>: <% xlet.type %><% } %><% if (xlet.value){ %>= <% xlet.value %><% } %>;
+  <%= xlet.decl %> <%= xlet.name %> <% if (xlet.type){ %>: <%= xlet.type %><% } %><% if (xlet.value){ %>= <%= xlet.value %><% } %>;
 <% }); %>
 <% } %>
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-      <% if (beforeeach.providers) { %>
-        <% beforeeach.providers.forEach((provider) => { %>
-        <% if (provider.useClass) { %>
-        { provide: <% provider.provide %>, useClass: <% provider.useClass %> },
-        <% } else { %>
-        <% provider.provide %>,
-        <% } %>
-        <% }); %>
-      <% } %>
-      ] ,
       imports: [
       <% if (beforeeach.imports) { %>
         <% beforeeach.imports.forEach((ximport) => { %>
-        <% ximport %>,
+        <%= ximport %>,
+        <% }); %>
+      <% } %>
+      ],
+      providers: [
+        <%= classify(className) %>Service,
+      <% if (beforeeach.providers) { %>
+        <% beforeeach.providers.forEach((provider) => { %>
+        <% if (provider.useClass) { %>
+        { provide: <%= provider.provide %>, useClass: <%= provider.useClass %> },
+        <% } else { %>
+        <%= provider.provide %>,
+        <% } %>
         <% }); %>
       <% } %>
       ]
     });
 
     service = TestBed.get(<%= classify(className) %>Service);
+    <% if (beforeeach.calls) { %>
+    <% beforeeach.calls.forEach((bcall) => { %>
+    <%= bcall %>;
+    <% }) %>
+    <% } %>
   });
 
   beforeEach(() => {
     <% if (mocks) { %>
     <% mocks.forEach((mock) => { %>
-    <% mock.name %> = TestBed.get(<% mock.type %>);
+    <%= mock.name %> = TestBed.get(<%= mock.typeReference %>);
     <% }); %>
     <% } %>
 
     <% standardMocks.forEach((smock) => { %>
-    <% smock.name %> = TestBed.get(<%- smock.type %>);
+    <%= smock.name %> = TestBed.get(<%= smock.typeReference %>);
     <% }); %>
+  });
+
+  afterEach(() => {
+    <% if (aftereach.calls) { %>
+    <% aftereach.calls.forEach((xcall) => { %>
+    <%= xcall %>;
+    <% }) %>
+    <% } %>
   });
 
   it('should test service', () => {
