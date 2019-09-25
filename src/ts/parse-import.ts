@@ -1,13 +1,14 @@
 import {
   ExternalModuleReference,
   Identifier,
-  NamedImports,
   ImportDeclaration,
   ImportEqualsDeclaration,
+  NamedImports,
   NamespaceImport,
   StringLiteral,
 } from 'typescript';
 import * as ts from 'typescript';
+import * as parse from './parse';
 
 export enum ImportType {
   NAMED = "NAMED",
@@ -19,6 +20,8 @@ export enum ImportType {
 export interface ImportDetails {
   originalImport: string;
   importType?: ImportType;
+  isDependency: boolean; // true if resolved under node_modules
+  froms: string[];       // [a, b] out of 'import {a, b} from..'
   lib: string;
   specifiers?: string;
   alias?: string,
@@ -29,13 +32,18 @@ export interface ImportDetails {
 export function importDetails(importNode: ImportDeclaration | ImportEqualsDeclaration): ImportDetails {
   let details: ImportDetails = {
     originalImport: importNode.getText(),
+    isDependency: false,
+    froms: [],
     lib: '',
     importType: null,
     specifiers: null,
     alias: null,
-    node: importNode
+    node: parse.cleanNode(importNode)
   };
+  // console.log('-- orig imp', importNode.getText() || importNode);
+
   if (ts.isImportDeclaration(importNode)) {
+
     if (importNode.importClause && ts.isNamespaceImport(importNode.importClause.namedBindings)) {
       namespaceImport(details, importNode);
     } else if (importNode.importClause && (ts.isNamedImports(importNode.importClause.namedBindings) || importNode.importClause.name)) {
@@ -45,6 +53,23 @@ export function importDetails(importNode: ImportDeclaration | ImportEqualsDeclar
     }
   } else if (ts.isExternalModuleReference(importNode.moduleReference)) {
     externalModuleImport(details, importNode.name.text, importNode.moduleReference);
+  }
+  if (details.lib.startsWith('@')) {
+    // tsconfig local compilerOptions.paths map may start with '@'
+    const opts = ts.getDefaultCompilerOptions();
+    let isLocal: boolean = false;
+    for (let key in opts.paths) {
+      if (details.lib === key || details.lib.startsWith(key)) {
+        isLocal = true;
+        break;
+      }
+    }
+    details.isDependency = !isLocal;
+  }  if (details.lib.startsWith('.')) {
+    // ./ or ../
+    details.isDependency = false;
+  } else {
+    details.isDependency = true;
   }
   return details;
 }
@@ -69,10 +94,13 @@ function namedImport(details: ImportDetails, node: ImportDeclaration) {
             details.alias = alias;
           } else {
             specifiers.push(spec + ' as ' + alias);
+            details.froms.push(spec);
+            details.froms.push(alias);
           }
         } else {
           spec = o.name.text;
           specifiers.push(spec);
+          details.froms.push(spec);
         }
       }
     );
@@ -87,6 +115,7 @@ function namespaceImport(details: ImportDetails, node: ImportDeclaration) {
   const lib = node.moduleSpecifier as StringLiteral;
   const id = (node.importClause.namedBindings as NamespaceImport).name as Identifier;
   details.lib = lib.text;
+  details.froms.push(lib.text);
   details.alias = id.text;
 }
 
@@ -105,5 +134,6 @@ function externalModuleImport(details: ImportDetails, name: string, node: Extern
   details.alias = name;
   const lib = node.expression as Identifier;
   details.lib = lib.text;
+  details.froms.push(name);
 }
 

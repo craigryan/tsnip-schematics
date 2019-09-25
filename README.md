@@ -116,6 +116,9 @@ Variables recognised within the templates.
 
 ## AST for test.service.ts
 
+To re-generate this output, edit src/tsnip/index.ts and uncomment showTree() code. Build/link the schematic and run 
+it again in the tsnip-cli8-project
+
     SourceFile
         SyntaxList
             ImportDeclaration

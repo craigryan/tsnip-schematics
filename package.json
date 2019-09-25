@@ -6,7 +6,8 @@
   "types": "/lib/tsnip/index.d.ts",
   "files": [
     "lib/**/*",
-    "src/*/files/**/*"
+    "src/**/files/*",
+    "src/collection.json"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -21,7 +22,11 @@
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "copy:schemas": "cp --parents src/*/schema.json ./lib/",
+    "copy:files": "cp --parents -p src/*/files/** ./lib/",
+    "copy:collection": "cp src/collection.json ./lib",
+    "xpostbuild": "npm-run-all copy:schemas copy:files copy:collection"
   },
   "keywords": [
     "schematics",
@@ -30,6 +35,15 @@
     "test",
     "snippets"
   ],
+  "homepage": "https://github.com/craigryan/tsnip-schematics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/craigryan/tsnip-schematics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/craigryan/tsnip-schematics/issues",
+    "email": "cryan.dublin@gmail.com"
+  },
   "author": "Craig Ryan",
   "license": "MIT",
   "schematics": "./src/collection.json",
@@ -44,11 +58,12 @@
   },
   "devDependencies": {
     "jasmine-ts": "^0.3.0",
+    "mem": ">=4.0.0",
     "nodemon": "^1.19.1",
     "npm-run-all": "^4.1.5",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
-    "ts-node": "^8.3.0",
+    "ts-node": "^7.0.1",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0"
   }

@@ -5,14 +5,14 @@ import {buildDefaultPath, getProject} from '@schematics/angular/utility/project'
 
 import {parseName} from '@schematics/angular/utility/parse-name';
 // import {paths} from '@schematics/angular/utility/paths';
-import { WorkspaceSchema, WorkspaceProject, ProjectType } from '@schematics/angular/utility/workspace-models';
+import { ProjectType, WorkspaceProject, WorkspaceSchema } from '@schematics/angular/utility/workspace-models';
 
 import { constants } from './constants';
 import * as ts from 'typescript';
 import { tsSource, tsSourceExists, tsSourcePathExists } from '../ts/source';
 import * as parse from '../ts/parse';
 import * as parsei from '../ts/parse-import';
-import { ImportMaps } from './import-maps';
+import * as imports from '../common/imports/imports';
 
 function relativeProjectPath(project: WorkspaceProject<ProjectType.Application | ProjectType.Library>) {
   const buildPath = buildDefaultPath(project);
@@ -31,60 +31,23 @@ function setClassName(options: any) {
   // console.log('-- set class name', options.className);
 }
 
-function addRequiredTestImports(options: any): void {
-  options.libraries.forEach((lib: string) => {
-    switch (lib) {
-    case 'commonhttp':
-      options.imports.push(
-        {imports: '{HttpClientTestingModule, HttpTestingController}', from: '@angular/common/http/testing'}
-      );
-      break;
-    case 'redux':
-      options.imports.push(
-        {imports: '{MockNgRedux, NgReduxTestingModule}', from: '@angular-redux/store/lib/testing'}
-      );
-      break;
-    case 'forms':
-      options.imports.push(
-        {imports: '{FormsModule, ReactiveFormsModule}', from: '@angular/forms'}
-      );
-      break;
-    case 'ngrx':
-      options.imports.push(
-        {imports: '{ provideMockStore, MockStore }', from: '@ngrx/store/testing'}
-      );
-      break;
-    }
-  });
-}
-
-function addReferencedLibraries(libs: Array<string>, details: parsei.ImportDetails): void {
-  const libraries: Array<string> = [];
-  ImportMaps.addLibraries(libraries, details.lib);
-  libraries.forEach((lib) => {
-    if (!libs.includes(lib)) {
-      libs.push(lib);
-    }
-  });
-}
-
 export function addImportsAndLibraries(options: any): void {
-  let sourcePath = tsSourceExists(options.sourcePath) ? options.sourcePath : null;
+  const sourcePath = tsSourceExists(options.sourcePath) ? options.sourcePath : null;
   if (!sourcePath) {
     // console.log('-- source[path] doesnt exist:', options.sourcePath);
     return;
   }
-  let srcNode: ts.Node = tsSource(options.sourcePath);
-  const imports: Array<any> = parse.findImportStatements(srcNode);
-  options.imports = [];
+  const srcNode: ts.Node = tsSource(options.sourcePath);
+  const importStatements: any[] = parse.findImportStatements(srcNode);
   options.libraries = [];
-  imports.forEach((i) => {
+  options.imports = [];
+  importStatements.forEach((i) => {
     const details: parsei.ImportDetails = parsei.importDetails(i);
     // console.log('-- add import, lib', details.originalImport, details.lib);
-    addReferencedLibraries(options.libraries, details);
-    options.imports.push(details.originalImport);
+    imports.addReferencedLibraries(options.libraries, details.lib);
+    options.imports.push({ originalImport: details.originalImport });
   });
-  addRequiredTestImports(options);
+  options.imports = options.imports.concat(imports.requiredTestImports(options.libraries));
 }
 
 // Search the workspace (package.json) to determine the options path, file name and file type (service, component, etc)
@@ -121,7 +84,7 @@ export function setupOptions(host: Tree, options: any): Tree {
   setClassName(options);
   // console.log('-- setup options', JSON.stringify(options, null, 4));
 
-  if (!options.imports) {
+  if (!options.imports && !options.libraries) {
     addImportsAndLibraries(options);
   }
   return host;

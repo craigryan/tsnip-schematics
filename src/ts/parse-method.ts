@@ -9,6 +9,7 @@ export interface MethodDetails {
   isPrivate: boolean;
   parameters: ts.Node[] | undefined;
   returnType?: ts.Node | undefined;
+  body: ts.Node;
 }
 
 /*
@@ -48,7 +49,8 @@ export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | nul
     name: '',
     isPrivate: false,
     parameters: [],
-    returnType: undefined
+    returnType: undefined,
+    body: undefined
   };
   enum STATES { START, NAME, PARAMS, RETURN };
   let state: STATES = STATES.START;
@@ -75,9 +77,6 @@ export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | nul
         // console.log('m name, kind', ts.SyntaxKind[childNode.kind]);
         if (childNode.kind === ts.SyntaxKind.Parameter) {
           // console.log('m name, param, top node');
-          if (!mDecl.parameters) {
-            mDecl.parameters = [];
-          }
           mDecl.parameters.push(childNode);
         } else if (childNode.kind === ts.SyntaxKind.SyntaxList) {
           // TODO can this condition happen??
@@ -86,9 +85,6 @@ export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | nul
             // console.log('  next param, kind', ts.SyntaxKind[paramNode.kind]);
             if (paramNode.kind === ts.SyntaxKind.Parameter) {
               // console.log('m name, param');
-              if (!mDecl.parameters) {
-                mDecl.parameters = [];
-              }
               mDecl.parameters.push(paramNode);
             }
           });
@@ -109,8 +105,9 @@ export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | nul
           if (childNode.kind === ts.SyntaxKind.ColonToken) {
             // has return type
             expectReturn = true;
-          } else if (childNode.kind == ts.SyntaxKind.Block) {
+          } else if (childNode.kind === ts.SyntaxKind.Block) {
             // end of return type (if any)
+            mDecl.body = parse.cleanNode(childNode);
             state = STATES.RETURN;
           }
         }
@@ -124,6 +121,9 @@ export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | nul
     });
   }
   // console.log('m decl', mDecl);
+  if (!mDecl.body) {
+    mDecl.body = parse.cleanNode(findMethodBody(decl));
+  }
   return mDecl;
 }
 
@@ -149,6 +149,6 @@ export function findGetterDeclaration(source: ts.Node): MethodDetails | null {
 }
 
 // Method block, used to parse familiar calls
-export function findMethodBlock(source: ts.Node): ts.Node | null {
+export function findMethodBody(source: ts.Node): ts.Node | null {
   return parse.findFirstNode(source, ts.SyntaxKind.Block);
 }

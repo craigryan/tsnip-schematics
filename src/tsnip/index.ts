@@ -15,11 +15,13 @@ export function tsnip(options: any): Rule {
     setupOptions(tree, options);
 
     const node = tsSource(options.sourcePath);
-    /*
+
     if (node) {
-      showTree(node);
+      // only call this when updating the syntax tree in myapi.service.ts in 
+      // tsnip-cli-project
+
+      // showTree(node);
     }
-    */
 
     const rule = chain([
       options.isService ? schematic(constants.serviceSchematic, options) : noop()

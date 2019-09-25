@@ -1,21 +1,31 @@
+// tslint:disable-next-line: ordered-imports
 import { Injectable, Inject } from '@angular/core';
+// tslint:disable-next-line: ordered-imports
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
-import {select} from '@angular-redux/store';
 
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
-import * as ts from 'typescript';
 
+import * as ts from 'typescript';
+// tslint:disable-next-line: ordered-imports
+import 'rxjs/everything';
+
+import {aaa, bbb} from '../my.imports';
 import {TestConstants} from './test.constants';
+
+import ext = require('ext-lib');
+
+import {select} from '@angular-redux/store';
 
 interface ApiResponse {
   stringValue: string
 }
 
 class MyType {
-  typeName: String;
+  public typeName: string;
 }
 
+// tslint:disable-next-line: max-classes-per-file
 @Injectable({
   providedIn: 'root'
 })
@@ -40,6 +50,7 @@ export class TestService {
       withCredentials: true
     };
     if (this.hasSecrets) {
+      console.log('calling secretMethod');
       this.secretMethod(url);
     }
     requestArguments.headers['x-stuff'] = 'api';
@@ -49,9 +60,14 @@ export class TestService {
     return this.http.get<ApiResponse>(url, requestArguments)
       .pipe(
         map(response => {
-          return response.stringValue;
-        })
+          return response.stringValue || this.secretString();
+        }),
+        map((responseString: string) => responseString.toUpperCase())
       );
+  }
+
+  secretString(): string {
+    return 'a secret;'
   }
 
   public storeResult(result: string): void {

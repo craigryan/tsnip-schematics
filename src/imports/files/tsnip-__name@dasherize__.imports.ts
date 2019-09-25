@@ -6,10 +6,14 @@ import {DebugElement, Injectable, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA} from
 
 <% if (imports) { %>
 <%   for (let rimport of imports) { %>
-<%     if (rimport.from) { %>
+    <%     if (rimport.from) { %>
 import <%= rimport.imports %> from <%= rimport.from %>;
 <%     } else { %>
+<%        if (rimport.originalImport) { %>
+<%= rimport %>;
+<%        } else { %>
 import <%= rimport %>;
+<%        } %>
 <%     } %>
 <%   } %>
 <% } %>
