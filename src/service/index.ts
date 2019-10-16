@@ -11,38 +11,25 @@ import {
   MergeStrategy,
   schematic
 } from '@angular-devkit/schematics';
+
 import {join, Path, strings, normalize} from '@angular-devkit/core';
 
 import * as ts from 'typescript';
-import * as parsec from '../ts/parse-class';
-import * as parsep from '../ts/parse-params';
-import * as parsem from '../ts/parse-method';
-import * as parseb from '../ts/parse-block';
 import * as parse from '../ts/parse';
+import * as parsec from '../ts/parse-class';
+import * as parsem from '../ts/parse-method';
+import * as parsep from '../ts/parse-params';
+import * as parseb from '../ts/parse-block';
+
 import * as angular from '../utils/angular';
+import { format } from '../utils/format';
 import { tsSource } from '../ts/source';
 
 // import * as parsem from './parse-method';
 // import * as parsei from './parse-import';
 
 import {constants} from '../utils/constants';
-import * as Service from './service';
-
-function addMethodBody(node: ts.Node, options: any): void {
-  const methodDecl: parsem.MethodDetails = parsem.findMethodDeclaration(node);
-  // if (options.parsed.ctorParams && options.parsed.ctorParams.params.length > 0) {
-  options.methods.push({ name: methodDecl.name, calls: parseb.generateMethodCalls(options.parsed.ctorParams, node, methodDecl)});
-}
-
-function addMethod(node: ts.Node, options: any): void {
-  const publicMethods: ts.Node[] = parsec.findClassMethods(node, true);
-  if (publicMethods && publicMethods.length > 0) {
-    options.methods = [];
-    publicMethods.forEach((method: ts.Node) => {
-      addMethodBody(method, options);
-    });
-  }
-}
+import * as service from './service';
 
 function addParsed(node: ts.Node, options: any): void {
   const ctor: ts.Node = parsec.findClassConstructor(node);
@@ -86,10 +73,10 @@ function addLets(node: ts.Node, options: any): void {
   	options.lets.push({decl: 'let', name: 'reduxDispatchSpy'});
 	  options.lets.push({decl: 'let', name: 'reduxSelectSpy'});
   }
-  for (let mock of options.mocks) {
+  for (const mock of options.mocks) {
     options.lets.push({decl: 'let', name: mock.name, type: mock.typeReference});
   }
-  for (let smock of options.standardMocks) {
+  for (const smock of options.standardMocks) {
     switch (smock.typeReference) {
     case 'HttpClient':
       options.lets.push({decl: 'let', name: 'httpMock', type: 'HttpTestingController'});
@@ -101,16 +88,16 @@ function addLets(node: ts.Node, options: any): void {
       break;
     }
   }
-  console.log('-- lets', options.lets);
+  // console.log('-- lets', options.lets);
 }
 
 function addBeforeAndAfterEach(node: ts.Node, options: any): void {
   // top level beforeEach()
   // -- lets libaries [ 'commonhttp', 'redux-store', 'redux' ]
   options.beforeeach = {
-    providers: [],
+    calls: [],
     imports: [],
-    calls: []
+    providers: []
   };
   options.aftereach = {
     calls: []
@@ -131,9 +118,9 @@ function addBeforeAndAfterEach(node: ts.Node, options: any): void {
     switch (lib) {
     case 'redux-store':
       options.beforeeach.imports.push('NgReduxTestingModule');
-      options.beforeeach.calls.push('reduxDispatchSpy = spyOn(MockNgRedux.mockInstance, \'dispatch\'');
-      options.beforeeach.calls.push('reduxSelectSpy = spyOn(MockNgRedux.mockInstance, \'select\'');
-      options.beforeeach.calls.push('MockNgRedux.reset();');
+      options.beforeeach.calls.push('reduxDispatchSpy = spyOn(MockNgRedux.mockInstance, \'dispatch\')');
+      options.beforeeach.calls.push('reduxSelectSpy = spyOn(MockNgRedux.mockInstance, \'select\')');
+      options.beforeeach.calls.push('MockNgRedux.reset()');
       break;
     }
   }
@@ -151,13 +138,14 @@ function addBeforeAndAfterEach(node: ts.Node, options: any): void {
 
 export function serviceSchematics(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    const node = tsSource(options.sourcePath);
+    const fileNode = tsSource(options.sourcePath);
+    const serviceNode: ts.Node = parse.findClassDeclarationForDecorator(fileNode, 'Injectable');
 
-    addParsed(node, options);
-    addMocks(node, options);
-    addLets(node, options);
-    addBeforeAndAfterEach(node, options);
-    Service.serviceClass(node, options);
+    addParsed(serviceNode, options);
+    addMocks(serviceNode, options);
+    addLets(serviceNode, options);
+    addBeforeAndAfterEach(serviceNode, options);
+    service.serviceClass(fileNode, serviceNode, options);
 
     const rule = chain([
       schematic(constants.importsSchematic, options),
@@ -173,7 +161,8 @@ export function serviceSchematics(options: any): Rule {
           template({
             ...strings, ...options
           }),
-          move(options.outputPath)
+          move(options.outputPath),
+          format(options.outputPath)
         ]),
         MergeStrategy.Default
       )

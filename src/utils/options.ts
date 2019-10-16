@@ -78,7 +78,7 @@ export function setupOptions(host: Tree, options: any): Tree {
   options.name = parsedPath.name;
   options.path = parsedPath.path.substring(1);
   options.sourcePath = join(normalize(options.path), options.name + '.ts');
-  options.outputPath = './public';
+  options.outputPath = '/public';
   options.isService = options.name.endsWith(constants.serviceFileExtension);
   options.isComponent = options.isService ? false : options.name.endsWith(constants.componentFileExtension);
   setClassName(options);

@@ -172,6 +172,12 @@ fdescribe('Parsing', () => {
       const name = parsec.findClassName(clz);
       expect(name).toEqual('TestService');
     });
+    it('should find class for decorator Injectable', () => {
+      const clz: ts.Node = parse.findClassDeclarationForDecorator(fileNode, 'Injectable');
+      expect(clz).toBeTruthy();
+      const name = parsec.findClassName(clz);
+      expect(name).toEqual('TestService');
+    });
   });
 
   describe('in class', () => {
@@ -185,6 +191,7 @@ fdescribe('Parsing', () => {
       expect(n).toBeTruthy();
       expect(n.kind).toBeTruthy();
       expect(n.kind).toEqual(ts.SyntaxKind.Decorator);
+      expect(parsec.findClassDecoratorName(n)).toEqual('Injectable');
       // TODO find NV pairs, providedIn: 'root' etc
     });
     it('should find declarations', () => {

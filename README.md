@@ -13,7 +13,7 @@ ng g service myapi
 In the case of tsnip the file already exists and the type is determined from it's name, therefore the name will be specified including the type, eg `myapi.service`:
 
 ```bash
-ng g tsnip-schematics:tsnip --name=myapi.service
+ng g tsnip-schematics:tsnip --name=myapi.service --force
 ```
 
 ## Run tsnip
@@ -47,10 +47,10 @@ Link this project `npm link` then use it from another cli generated application.
 
 From the other project `npm link tsnip-schematics` to link tsnip into ./node_modules
 
-Run the schematics with a service source file to generate specs and imports:
+Run the schematics with a service source file to generate specs and imports, unconditionally overwriting existing generated source:
 
 ```bash
-ng g tsnip-schematics:tsnip --name=myapi.service
+ng g tsnip-schematics:tsnip --name=myapi.service --force
 ```
 
 Note: the name is relative to the default 'src/app' (or lib) project directory.

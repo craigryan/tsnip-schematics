@@ -46,15 +46,14 @@ export interface MethodDetails {
 // Method name, params and return type
 export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | null {
   const mDecl: MethodDetails = {
-    name: '',
+    body: undefined,
     isPrivate: false,
+    name: '',
     parameters: [],
-    returnType: undefined,
-    body: undefined
+    returnType: undefined
   };
-  enum STATES { START, NAME, PARAMS, RETURN };
+  enum STATES { START, NAME, RETURN };
   let state: STATES = STATES.START;
-  let expectReturn = false;
 
   if (decl) {
     ts.forEachChild(decl, childNode => {
@@ -62,54 +61,29 @@ export function findMethodDeclaration(decl: ts.Node | null): MethodDetails | nul
       switch (state) {
       case STATES.START:
         // console.log('m start');
-        if (childNode.kind == ts.SyntaxKind.Identifier) {
+        if (childNode.kind === ts.SyntaxKind.Identifier) {
           mDecl.name = childNode.getText();
           state = STATES.NAME;
           // console.log('m start name', mDecl.name);
-        } else if (childNode.kind == ts.SyntaxKind.OpenParenToken) {
-          // console.log('m start open paren');
-          state = STATES.NAME;
-        } else if (childNode.kind == ts.SyntaxKind.PrivateKeyword) {
+        } else if (childNode.kind === ts.SyntaxKind.PrivateKeyword) {
           mDecl.isPrivate = true;
         }
         break;
       case STATES.NAME:
         // console.log('m name, kind', ts.SyntaxKind[childNode.kind]);
         if (childNode.kind === ts.SyntaxKind.Parameter) {
-          // console.log('m name, param, top node');
+          // console.log('m name, param');
           mDecl.parameters.push(childNode);
-        } else if (childNode.kind === ts.SyntaxKind.SyntaxList) {
-          // TODO can this condition happen??
-          // console.log('m name, syntax list, loop and look for params');
-          ts.forEachChild(childNode, paramNode => {
-            // console.log('  next param, kind', ts.SyntaxKind[paramNode.kind]);
-            if (paramNode.kind === ts.SyntaxKind.Parameter) {
-              // console.log('m name, param');
-              mDecl.parameters.push(paramNode);
-            }
-          });
-          state = STATES.PARAMS;
-        } else {
-          // end of params
-          // console.log('m name, param done');
-          state = STATES.PARAMS;
-        }
-        break;
-      case STATES.PARAMS:
-        // console.log('m params');
-        if (expectReturn) {
-          // console.log('m params, return type node expected..');
-          mDecl.returnType = childNode;
+        } else if (childNode.kind === ts.SyntaxKind.TypeReference) {
+          // console.log('m name, return type ref');
+          mDecl.returnType = parse.cleanNode(childNode);
+          state = STATES.RETURN;
+        } else if (childNode.kind === ts.SyntaxKind.Block) {
+          // console.log('m params, block after params');
+          mDecl.body = parse.cleanNode(childNode);
           state = STATES.RETURN;
         } else {
-          if (childNode.kind === ts.SyntaxKind.ColonToken) {
-            // has return type
-            expectReturn = true;
-          } else if (childNode.kind === ts.SyntaxKind.Block) {
-            // end of return type (if any)
-            mDecl.body = parse.cleanNode(childNode);
-            state = STATES.RETURN;
-          }
+          state = STATES.RETURN;
         }
         break;
       case STATES.RETURN:

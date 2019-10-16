@@ -76,7 +76,13 @@ describe('<%= classify(className) %>Service test', () => {
     <% } %>
   });
 
-  it('should test service', () => {
-    console.log('test invoked');
-  });
+  <% clazz.methods.forEach((m) => { %>
+    describe('and <%= m.name %>', () => {
+      <% m.calls.forEach((call) => { %>
+        it('should call <%= call.name %>', () => {
+      
+        });
+      <% }); %>
+    });
+  <% }) %>
 });

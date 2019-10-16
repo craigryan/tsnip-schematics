@@ -23,13 +23,13 @@ export class ImportMaps {
     // console.log('-- imp match name', name);
 	Object.keys(StandardImports)
 	  .filter(key => {
-		return name.match(new RegExp(key));
+		  return name.match(new RegExp(key));
 	  }).forEach(key => {
-		// console.log('-- map  ' + key + ' to ' + StandardImports[key]);
-		const newKey: string = StandardImports[key];
-		if (!map.includes(newKey)) {
-		  map.push(newKey);
-		}
+		  // console.log('-- map  ' + key + ' to ' + StandardImports[key]);
+		  const newKey: string = StandardImports[key];
+		  if (!map.includes(newKey)) {
+		    map.push(newKey);
+      }
 	  });
   }
 }

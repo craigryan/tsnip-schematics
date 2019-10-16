@@ -9,7 +9,7 @@ import { Injectable, Inject } from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 import {select} from '@angular-redux/store';
 
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import * as ts from 'typescript';
 
@@ -31,7 +31,7 @@ describe('TestService', () => {
       providers: [
         TestService,
         {
-          provide: testConstants.url,
+          provide: TestConstants.url,
           useValue: tokenUrl
         }
       ],
@@ -43,6 +43,7 @@ describe('TestService', () => {
 
   beforeEach(() => {
     service = TestBed.get(TestService);
+    httpMock = TestBed.get(HttpClient);
   });
 
   afterEach(() => {
@@ -63,10 +64,10 @@ describe('TestService', () => {
         expect(result).toBeTruthy();
       });
 
-      .... TODO httpMock.expectOne(tokenUrl).flush(tokenResponse);
+      // .... TODO httpMock.expeactOne(tokenUrl).flush(tokenResponse);
 
       const searchReq = httpMock.expectOne(req => req.method === 'GET' && req.url === searchUrl);
-      searchReq.flush(searchResponse);
+      searchReq.flush(apiResponse);
 
       expect(searchReq.request.headers.keys().length).toEqual(1);
       expect(searchReq.request.headers.keys()).toContain('x-stuff');

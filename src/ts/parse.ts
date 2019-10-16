@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 import * as ast from '@schematics/angular/utility/ast-utils';
+import * as parsec from './parse-class';
 import * as util from 'util'; // has no default export
 
 /*
@@ -114,6 +115,19 @@ export function findNthClassDeclaration(source: ts.Node, index: number = 0): ts.
   const decl = findNthNode(source, ts.SyntaxKind.ClassDeclaration, index);
   // console.log('decl node', ts.SyntaxKind[decl.kind]);
   return decl;
+}
+
+export function findClassDeclarationForDecorator(source: ts.Node, decorator: string): ts.Node | null {
+  const nodes: ts.Node[] = findNodes(source, ts.SyntaxKind.ClassDeclaration);
+  if (nodes) {
+    for (const classNode of nodes) {
+      const decoratorNode = parsec.findClassDecorator(classNode);
+      if (parsec.findClassDecoratorName(decoratorNode) === decorator) {
+        return classNode;
+      }
+    }
+  }
+  return null;
 }
 
 export function findNthNode(node: ts.Node, kind: ts.SyntaxKind, index: number): ts.Node | null {

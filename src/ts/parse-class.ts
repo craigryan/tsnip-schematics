@@ -41,6 +41,13 @@ export function findClassDecorator(classNode: ts.Node): ts.Node | null {
   return parse.findFirstNode(classNode, ts.SyntaxKind.Decorator);
 }
 
+export function findClassDecoratorName(decoratorNode: ts.Node): string {
+  const call: ts.CallExpression = parse.findFirstNode(decoratorNode, ts.SyntaxKind.CallExpression) as ts.CallExpression;
+  if (call && ts.isIdentifier(call.expression)) {
+    return call.expression.getText();
+  }
+}
+
 /*
                 ClassKeyword
                     Text: class
@@ -115,8 +122,8 @@ export function findClassDeclarations(classNode: ts.Node): ts.Node[] {
                         CloseParenToken
                             Text: )
 */
-export function findClassConstructor(source: ts.Node): ts.Node | null {
-  return parse.findFirstNode(source, ts.SyntaxKind.Constructor);
+export function findClassConstructor(classNode: ts.Node): ts.Node | null {
+  return parse.findFirstNode(classNode, ts.SyntaxKind.Constructor);
 }
 
 export function findConstructorParameters(ctor: ts.Node): parsep.ParamDeclarationList {
@@ -128,28 +135,22 @@ export function findConstructorParameters(ctor: ts.Node): parsep.ParamDeclaratio
 
   if (ctor) {
     ts.forEachChild(ctor, childNode => {
-      console.log('cp loop, kind', ts.SyntaxKind[childNode.kind]);
       switch (state) {
       case STATES.PARAMS:
-        console.log('cp params, kind', ts.SyntaxKind[childNode.kind]);
         if (childNode.kind === ts.SyntaxKind.Parameter) {
-          console.log('cp params, param, top node');
           paramList.params.push(parsep.paramDeclaration(childNode));
         } else {
           // end of params
-          console.log('cp name, param done');
           state = STATES.END;
         }
         break;
       case STATES.END:
       default:
-        console.log('cp return');
         // ignore everything else
         break;
       }
     });
   }
-  // console.log('m decl', mDecl);
   return paramList;
 }
 
@@ -181,7 +182,7 @@ export function findClassMethods(source: ts.Node, publicOnly: boolean): ts.Node[
   if (!publicOnly) {
     return allMethods || [];
   }
-  let publicMethods = [];
+  const publicMethods = [];
   if (allMethods) {
     for (const method of allMethods) {
       if (!parsem.isPrivateMethod(method)) {
